@@ -213,69 +213,77 @@ Below is an example of setting AWS credential as part of table config using envi
 {% code title="pinot-table-offline.json" %}
 ```json
 "OFFLINE": {
-    "tableName": "pinotTable",
-    "tableType": "OFFLINE",
-    "quota": {
-      "maxQueriesPerSecond": 300,
-      "storage": "140G"
-    },
-    "routing": {
-      "segmentPrunerTypes": ["partition"],
-      "instanceSelectorType": "replicaGroup"
-    },
-    "segmentsConfig": {
-      "schemaName": "pinotTable",
-      "timeColumnName": "daysSinceEpoch",
-      "timeType": "DAYS",
-      "allowNullTimeValue": false,
-      "replication": "3",
-      "retentionTimeUnit": "DAYS",
-      "retentionTimeValue": "365",
-      "segmentPushFrequency": "DAILY",
-      "segmentPushType": "APPEND"
-    },
-    "tableIndexConfig": {
-      "invertedIndexColumns": ["foo", "bar", "moo"],
-      "createInvertedIndexDuringSegmentGeneration": false,
-      "sortedColumn": ["pk"],
-      "bloomFilterColumns": [],
-      "starTreeIndexConfigs": [],
-      "noDictionaryColumns": [],
-      "rangeIndexColumns": [],
-      "onHeapDictionaryColumns": [],
-      "varLengthDictionaryColumns": [],
-      "segmentPartitionConfig": {
-        "pk": {
-          "functionName": "Murmur",
-          "numPartitions": 32
-        }
+  "tableName": "pinotTable",
+  "tableType": "OFFLINE",
+  "quota": {
+    "maxQueriesPerSecond": 300,
+    "storage": "140G"
+  },
+  "routing": {
+    "segmentPrunerTypes": [
+      "partition"
+    ],
+    "instanceSelectorType": "replicaGroup"
+  },
+  "segmentsConfig": {
+    "schemaName": "pinotTable",
+    "timeColumnName": "daysSinceEpoch",
+    "timeType": "DAYS",
+    "allowNullTimeValue": false,
+    "replication": "3",
+    "retentionTimeUnit": "DAYS",
+    "retentionTimeValue": "365",
+    "segmentPushFrequency": "DAILY",
+    "segmentPushType": "APPEND"
+  },
+  "tableIndexConfig": {
+    "invertedIndexColumns": [
+      "foo",
+      "bar",
+      "moo"
+    ],
+    "createInvertedIndexDuringSegmentGeneration": false,
+    "sortedColumn": [
+      "pk"
+    ],
+    "bloomFilterColumns": [],
+    "starTreeIndexConfigs": [],
+    "noDictionaryColumns": [],
+    "rangeIndexColumns": [],
+    "onHeapDictionaryColumns": [],
+    "varLengthDictionaryColumns": [],
+    "segmentPartitionConfig": {
+      "pk": {
+        "functionName": "Murmur",
+        "numPartitions": 32
       }
-      "loadMode": "MMAP",
-      "columnMinMaxValueGeneratorMode": null,
-      "nullHandlingEnabled": false
     },
-    "tenants": {
-      "broker": "myBrokerTenant",
-      "server": "myServerTenant"
+    "loadMode": "MMAP",
+    "columnMinMaxValueGeneratorMode": null,
+    "nullHandlingEnabled": false
+  },
+  "tenants": {
+    "broker": "myBrokerTenant",
+    "server": "myServerTenant"
+  },
+  "ingestionConfig": {
+    "filterConfig": {
+      "filterFunction": "Groovy({foo == \"VALUE1\"}, foo)"
     },
-    "ingestionConfig": {
-      "filterConfig": {
-        "filterFunction": "Groovy({foo == \"VALUE1\"}, foo)"
-      },
-      "transformConfigs": [{
+    "transformConfigs": [
+      {
         "columnName": "bar",
         "transformFunction": "lower(moo)"
       },
       {
         "columnName": "hoursSinceEpoch",
         "transformFunction": "toEpochHours(millis)"
-      }]
-    }
-    "metadata": {
-      "customConfigs": {
-        "key": "value",
-        "key": "value"
       }
+    ]
+  },
+  "metadata": {
+    "customConfigs": {
+      "key": "value"
     }
   }
 }
@@ -289,54 +297,65 @@ Here's an example table config for a real-time table. **All the fields from the 
 {% code title="pinot-table-realtime.json" %}
 ```json
 "REALTIME": {
-    "tableName": "pinotTable",
-    "tableType": "REALTIME",
-    "segmentsConfig": {
-      "schemaName": "pinotTable",
-      "timeColumnName": "daysSinceEpoch",
-      "timeType": "DAYS",
-      "allowNullTimeValue": true,
-      "replicasPerPartition": "3",
-      "retentionTimeUnit": "DAYS",
-      "retentionTimeValue": "5",
-      "segmentPushType": "APPEND",
-      "completionConfig": {
-        "completionMode": "DOWNLOAD"
-      }
-    },
-    "tableIndexConfig": {
-      "invertedIndexColumns": ["foo", "bar", "moo"],
-      "sortedColumn": ["column1"],
-      "noDictionaryColumns": ["metric1", "metric2"],
-      "loadMode": "MMAP",
-      "nullHandlingEnabled": false,
-    },
-    "ingestionConfig:" {
-      "streamIngestionConfig": {
-       "streamConfigMaps":[
-        { "realtime.segment.flush.threshold.rows": "0",
-        "realtime.segment.flush.threshold.time": "24h",
-        "realtime.segment.flush.threshold.segment.size": "150M",
-        "stream.kafka.broker.list": "XXXX",
-        "stream.kafka.consumer.factory.class.name": "XXXX",
-        "stream.kafka.consumer.prop.auto.offset.reset": "largest",
-        "stream.kafka.consumer.type": "XXXX",
-        "stream.kafka.decoder.class.name": "XXXX",
-        "stream.kafka.decoder.prop.schema.registry.rest.url": "XXXX",
-        "stream.kafka.decoder.prop.schema.registry.schema.name": "XXXX",
-        "stream.kafka.hlc.zk.connect.string": "XXXX",
-        "stream.kafka.topic.name": "XXXX",
-        "stream.kafka.zk.broker.url": "XXXX",
-        "streamType": "kafka"
-      }
-    ]
-    },
-    "tenants":{
-      "broker": "myBrokerTenant",
-      "server": "myServerTenant",
-      "tagOverrideConfig": {}
-    },
-    "metadata": {}
+  "tableName": "pinotTable",
+  "tableType": "REALTIME",
+  "segmentsConfig": {
+    "schemaName": "pinotTable",
+    "timeColumnName": "daysSinceEpoch",
+    "timeType": "DAYS",
+    "allowNullTimeValue": true,
+    "replicasPerPartition": "3",
+    "retentionTimeUnit": "DAYS",
+    "retentionTimeValue": "5",
+    "segmentPushType": "APPEND",
+    "completionConfig": {
+      "completionMode": "DOWNLOAD"
+    }
+  },
+  "tableIndexConfig": {
+    "invertedIndexColumns": [
+      "foo",
+      "bar",
+      "moo"
+    ],
+    "sortedColumn": [
+      "column1"
+    ],
+    "noDictionaryColumns": [
+      "metric1",
+      "metric2"
+    ],
+    "loadMode": "MMAP",
+    "nullHandlingEnabled": false
+  },
+  "ingestionConfig": {
+    "streamIngestionConfig": {
+      "streamConfigMaps": [
+        {
+          "realtime.segment.flush.threshold.rows": "0",
+          "realtime.segment.flush.threshold.time": "24h",
+          "realtime.segment.flush.threshold.segment.size": "150M",
+          "stream.kafka.broker.list": "XXXX",
+          "stream.kafka.consumer.factory.class.name": "XXXX",
+          "stream.kafka.consumer.prop.auto.offset.reset": "largest",
+          "stream.kafka.consumer.type": "XXXX",
+          "stream.kafka.decoder.class.name": "XXXX",
+          "stream.kafka.decoder.prop.schema.registry.rest.url": "XXXX",
+          "stream.kafka.decoder.prop.schema.registry.schema.name": "XXXX",
+          "stream.kafka.hlc.zk.connect.string": "XXXX",
+          "stream.kafka.topic.name": "XXXX",
+          "stream.kafka.zk.broker.url": "XXXX",
+          "streamType": "kafka"
+        }
+      ]
+    }
+  },
+  "tenants": {
+    "broker": "myBrokerTenant",
+    "server": "myServerTenant",
+    "tagOverrideConfig": {}
+  },
+  "metadata": {}
 }
 ```
 {% endcode %}
